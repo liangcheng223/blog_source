@@ -1,0 +1,31 @@
+- class_name: 友情链接
+  class_desc: 示例
+  link_list:
+    - name: 张三的博客
+      link: https://zhangsan.example.com
+      avatar: https://zhangsan.example.com/avatar.png
+      descr: 一个喜欢折腾的前端
+    # - name: 李四的笔记
+    #   link: https://lisi.example.com
+    #   avatar: https://lisi.example.com/avatar.jpg
+    #   descr: 后端与运维随手记
+    # - name: 王五的小站
+    #   link: https://wangwu.example.com
+    #   avatar: https://wangwu.example.com/head.jpg
+    #   descr: 摄影与代码
+
+- class_name: 我的收藏
+  class_desc: 示例
+  link_list:
+    - name: 张三的博客
+      link: https://zhangsan.example.com
+      avatar: https://zhangsan.example.com/avatar.png
+      descr: 一个喜欢折腾的前端
+    # - name: 李四的笔记
+    #   link: https://lisi.example.com
+    #   avatar: https://lisi.example.com/avatar.jpg
+    #   descr: 后端与运维随手记
+    # - name: 王五的小站
+    #   link: https://wangwu.example.com
+    #   avatar: https://wangwu.example.com/head.jpg
+    #   descr: 摄影与代码
