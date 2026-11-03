@@ -24,6 +24,7 @@ menu:
     标签: /tags || fas fa-tags
     归档: /archives || fas fa-archive
   链接: /link || fas fa-link
+  说说: /shuoshuo || fas fa-comment-dots
   关于: /about || fas fa-user
   # List||fas fa-list:
   #   Music: /music/ || fas fa-music
@@ -920,7 +921,7 @@ clickShowText:
 # https://github.com/francoischalifour/medium-zoom
 # https://fancyapps.com/fancybox/
 # Leave it empty if you don't need lightbox
-lightbox:
+lightbox: fancybox
 
 # --------------------------------------
 # Tag Plugins settings
@@ -995,7 +996,7 @@ note:
 
 # https://github.com/MoOx/pjax
 pjax:
-  enable: false
+  enable: true
   # Exclude the specified pages from pjax, such as '/music/'
   exclude:
     # - /xxxxxx/

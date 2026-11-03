@@ -1,0 +1,23 @@
+- date: 2026-11-3 22:55:26
+  content: |
+    test.![](https://b.eval.moe/img/avatar.jpg)
+  tags:
+    - test
+
+# - author: Butterfly
+#   avatar: https://butterfly.js.org/img/avatar.png
+#   date: 2024-06-20 23:33:26
+#   key: key-2
+#   content: |
+#     This is a sample content for **Author 2**.
+#     ![Sample Image](https://via.placeholder.com/150)
+#   tags:
+#     - tag2
+#     - tag3
+
+# - author: Butterfly
+#   avatar: https://butterfly.js.org/img/avatar.png
+#   date: 2024-06-19 23:33:26
+#   key: key-3
+#   content: |
+#     This is a sample content for **Author 3**.
