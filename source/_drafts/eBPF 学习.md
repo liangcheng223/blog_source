@@ -6,7 +6,7 @@ date: '2026-11-04T15:14:28.180275+08:00'
 tags:
 - ebpf
 title: eBPF 学习
-updated: '2026-11-04T18:02:02.129+08:00'
+updated: '2026-11-05T15:37:32.444+08:00'
 ---
 ```
 ## eBPF 是什么
@@ -29,6 +29,7 @@ eBPF Go 库：一个 Go 库，解耦了获取 eBPF 字节码的过程与加载�
 
 ## 课程示例
 
+[eBPF 开发者教程与知识库：eBPF Tutorial by Example](https://github.com/eunomia-bpf/bpf-developer-tutorial/blob/main/README.zh.md)
 [bcc Python 开发者教程](https://github.com/iovisor/bcc/blob/master/docs/tutorial_bcc_python_developer.md    )
 
 第五课.sync_count.py
@@ -44,58 +45,75 @@ from bcc.utils import printb
 b = BPF(text="""
 #include <uapi/linux/ptrace.h>
 
-BPF_HASH(last);
+BPF_HASH(arr);
 
 int do_trace(struct pt_regs *ctx) {
-    u64 ts, *tsp, delta, key = 0;
-    u64 count_fast, count_slow = 0;
-    u64 count, count_key = 0;
-    u64 count_p;
-  
-    crst = last.lookup(&count_key);
+    u64 ts = 0, *tsp, delta = 0;
+    // key
+    u64 ts_key = 0, fast_key = 1, slow_key = 2;
+    // 指针
+    u64 *fastp, *slowp;
+    u64 count_fast = 0, count_slow = 0;
 
-    if(crst != NULL){
-
-    } else {
-        count = 1;
+    // 历史计数
+    fastp = arr.lookup(&fast_key);
+    if(fastp != NULL){
+        count_fast = *fastp;
     }
-    last.update(&count_key, &count)
+    slowp = arr.lookup(&slow_key);
+    if(slowp != NULL){
+        count_slow = *slowp;
+    }
 
-  
-    // attempt to read stored timestamp
-    tsp = last.lookup(&key);
-    if (tsp != NULL) {
+    // 时间戳
+    tsp = arr.lookup(&ts_key);
+    if(tsp != NULL){
         delta = bpf_ktime_get_ns() - *tsp;
-        if (delta < 1000000000) {
-            // output if time is less than 1 second
-            bpf_trace_printk("totle=%d, delta=%d\\n", count, delta / 1000000);
+        if(delta < 1000000000){
+            count_fast += 1;
+            arr.update(&fast_key, &count_fast);
         } else {
-            bpf_trace_printk("totle=%d\\n", count);
+            count_slow += 1;
+            arr.update(&slow_key, &count_slow);
         }
-        last.delete(&key);
+        bpf_trace_printk("%llu %llu %llu\\n",
+                         delta / 1000000, count_fast, count_slow);
     }
-
-    // update stored timestamp
     ts = bpf_ktime_get_ns();
-    last.update(&key, &ts);
+    arr.update(&ts_key, &ts);  
     return 0;
+
 }
 """)
 
 b.attach_kprobe(event=b.get_syscall_fnname("sync"), fn_name="do_trace")
 print("Tracing for quick sync's... Ctrl-C to end")
+print("%-8s %-6s %-10s %-6s %-6s" %
+      ("TIME(s)", "DELTA", "FAST", "SLOW", "TOTAL"))
 
 # format output
 start = 0
 while 1:
     try:
-        (task, pid, cpu, flags, ts, ms) = b.trace_fields()
+        (task, pid, cpu, flags, ts, msg) = b.trace_fields()
         if start == 0:
             start = ts
-        ts = ts - start
-        printb(b"At time %.2f s: multiple syncs detected, last %s ms ago" % (ts, ms))
+        rel_ts = ts - start
+        parts = msg.split()
+        if(len(parts) == 3):
+            delta_ms = int(parts[0])   
+            fast = int(parts[1])  
+            slow = int(parts[2])  
+            total = fast + slow   
+            print("%-8.2f %-6d %-10d %-6d %-6d" % (rel_ts, delta_ms, fast, slow, total))
+        else:
+            print("unexpected msg:", msg)
     except KeyboardInterrupt:
         exit()
+```
+
+```
+
 ```
 
 ```
