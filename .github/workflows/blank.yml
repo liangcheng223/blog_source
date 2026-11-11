@@ -8,7 +8,7 @@ on:
 # 关键优化：并发控制，连续推送时只保留最新一次，取消旧任务
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  queue: max
 
 jobs:
   build-and-deploy:
