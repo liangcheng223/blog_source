@@ -17,10 +17,10 @@
 - class_name: 我的收藏
   class_desc: 示例
   link_list:
-    - name: 张三的博客
-      link: https://zhangsan.example.com
-      avatar: https://zhangsan.example.com/avatar.png
-      descr: 一个喜欢折腾的前端
+    - name: slcyber.io
+      link: https://www.slcyber.io/research
+      avatar: https://cdn.prod.website-files.com/6a2184b69833d9fd0aa95783/6a74e89e802dc676c4c14a89_favicon.png
+      descr: Searchlight Labs 专注挖掘企业软件零日漏洞，发现即转化为客户可用的检测项，坚持“自己发现、自己验证、可据以行动”的发布标准。
     # - name: 李四的笔记
     #   link: https://lisi.example.com
     #   avatar: https://lisi.example.com/avatar.jpg
