@@ -1,10 +1,10 @@
 - class_name: 友情链接
   class_desc: 示例
   link_list:
-    - name: 张三的博客
-      link: https://zhangsan.example.com
-      avatar: https://zhangsan.example.com/avatar.png
-      descr: 一个喜欢折腾的前端
+    - name: 凉城的博客
+      link: https://b.eval.moe
+      avatar: https://b.eval.moe/img/avatar.jpg
+      descr: 一个喜欢折腾网络安全技术的人。
     # - name: 李四的笔记
     #   link: https://lisi.example.com
     #   avatar: https://lisi.example.com/avatar.jpg
