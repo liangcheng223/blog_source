@@ -25,6 +25,10 @@
       link: https://labs.watchtowr.com/
       avatar: https://storage.ghost.io/c/a0/dc/a0dcbbe4-0ae7-4d7e-90f7-ebbc3a0f5a84/content/images/size/w256h256/2022/05/Logo.png
       descr: 
+    - name: ransomware-monitor
+      link: https://ransomware.live/
+      avatar: https://ransomware.live/static/favicon.ico
+      descr:
     # - name: 李四的笔记
     #   link: https://lisi.example.com
     #   avatar: https://lisi.example.com/avatar.jpg
