@@ -6,7 +6,7 @@ date: '2026-11-26T12:39:59.162484+08:00'
 tags:
 - jwt
 title: 无境靶场——JWT 专题
-updated: '2026-11-26T12:40:04.120+08:00'
+updated: '2026-11-26T12:42:45.955+08:00'
 ---
 ## JWT专题一：无效签名验证
 
@@ -698,7 +698,7 @@ Final Token: eyJhbGciOiJSUzI1NiIsImprdSI6Imh0dHBzOi8vZnJlZWFlcy5jb20vamt1Lmpzb24
 
 ![image](https://img2.eval.moe/image-20260701235914-seoexrz.png)
 
-### JWT专题六：kid 参数注入
+## JWT专题六：kid 参数注入
 
 ### 题目
 
